@@ -1,11 +1,7 @@
 <template>
   <div class="users">
-    <!-- 面包屑 -->
-    <el-breadcrumb separator="/">
-      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>用户管理</el-breadcrumb-item>
-      <el-breadcrumb-item>用户列表</el-breadcrumb-item>
-    </el-breadcrumb>
+    <!-- navigator封装组件 -->
+    <Navigator level1="用户管理" level2="用户列表"></Navigator>
     <!-- 卡片视图 -->
     <el-card class="box-card">
       <!-- 搜索区域 -->
@@ -105,7 +101,7 @@
     </el-card>
     <!-- 添加用户对话框 -->
     <el-dialog
-      title="提示"
+      title="添加用户"
       :visible.sync="addDialogVisible"
       width="50%"
       @close="onCloseAddDialog"
@@ -137,7 +133,7 @@
     </el-dialog>
     <!-- 编辑用户对话框 -->
     <el-dialog
-      title="提示"
+      title="编辑用户"
       :visible.sync="editDialogVisible"
       width="50%"
       @close="onCloseEditDialog"
@@ -166,8 +162,11 @@
   </div>
 </template>
 <script>
+import Navigator from "../pubilc/Navigator";
+
 export default {
   name: "Users",
+  components: { Navigator },
   data() {
     // 自定义验证规则
     let checkEmail = (rule, value, callback) => {
@@ -399,9 +398,6 @@ export default {
     margin-top: 15px;
     box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.2) !important;
     .el-table {
-      margin-top: 15px;
-    }
-    .el-pagination {
       margin-top: 15px;
     }
   }
