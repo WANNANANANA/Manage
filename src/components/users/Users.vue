@@ -7,17 +7,8 @@
       <!-- 搜索区域 -->
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-input
-            v-model="queryInfo.query"
-            placeholder="请输入内容"
-            clearable
-            @clear="getUserList"
-          >
-            <el-button
-              slot="append"
-              icon="el-icon-search"
-              @click="onSearchUser"
-            ></el-button>
+          <el-input v-model="queryInfo.query" placeholder="请输入内容" clearable @clear="getUserList">
+            <el-button slot="append" icon="el-icon-search" @click="onSearchUser"></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
@@ -34,36 +25,15 @@
         <el-table-column label="状态" prop="mg_state">
           <!-- 作用域插槽 -->
           <template v-slot="scope">
-            <el-switch
-              v-model="scope.row.mg_state"
-              @change="onUserStateChange(scope.row)"
-            >
-            </el-switch>
+            <el-switch v-model="scope.row.mg_state" @change="onUserStateChange(scope.row)"></el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180px">
           <template v-slot="scope">
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="编辑"
-              placement="top"
-              :enterable="false"
-            >
-              <el-button
-                type="primary"
-                icon="el-icon-edit"
-                size="mini"
-                @click="onEditUser(scope)"
-              ></el-button>
+            <el-tooltip class="item" effect="dark" content="编辑" placement="top" :enterable="false">
+              <el-button type="primary" icon="el-icon-edit" size="mini" @click="onEditUser(scope)"></el-button>
             </el-tooltip>
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="删除"
-              placement="top"
-              :enterable="false"
-            >
+            <el-tooltip class="item" effect="dark" content="删除" placement="top" :enterable="false">
               <el-button
                 type="danger"
                 icon="el-icon-delete"
@@ -82,6 +52,7 @@
                 type="warning"
                 icon="el-icon-setting"
                 size="mini"
+                @click="onAssignRoles(scope)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -96,22 +67,11 @@
         :page-size="queryInfo.pagesize"
         layout="total, sizes, prev, pager, next, jumper"
         :total="total"
-      >
-      </el-pagination>
+      ></el-pagination>
     </el-card>
     <!-- 添加用户对话框 -->
-    <el-dialog
-      title="添加用户"
-      :visible.sync="addDialogVisible"
-      width="50%"
-      @close="onCloseAddDialog"
-    >
-      <el-form
-        :model="addForm"
-        :rules="addRules"
-        ref="addForm"
-        label-width="70px"
-      >
+    <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="50%" @close="onCloseAddDialog">
+      <el-form :model="addForm" :rules="addRules" ref="addForm" label-width="70px">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="addForm.username"></el-input>
         </el-form-item>
@@ -138,12 +98,7 @@
       width="50%"
       @close="onCloseEditDialog"
     >
-      <el-form
-        :model="editForm"
-        :rules="addRules"
-        ref="editForm"
-        label-width="70px"
-      >
+      <el-form :model="editForm" :rules="addRules" ref="editForm" label-width="70px">
         <el-form-item label="用户名">
           <el-input v-model="editForm.username" disabled></el-input>
         </el-form-item>
@@ -157,6 +112,31 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="onEditUserCancel">取 消</el-button>
         <el-button type="primary" @click="onEditUserConfirm">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 分配角色对话框 -->
+    <el-dialog
+      title="分配角色"
+      :visible.sync="assignDialogVisible"
+      width="50%"
+      @close="onCloseAssginDialog"
+    >
+      <div>
+        <p>当前的用户： {{assignForm.username}}</p>
+        <p>当前的角色：{{assignForm.role_name}}</p>
+        <p>分配新角色：</p>
+        <el-select v-model="selectedRoleId" placeholder="请选择">
+          <el-option
+            v-for="item in rolesList"
+            :key="item.id"
+            :label="item.roleName"
+            :value="item.id"
+          ></el-option>
+        </el-select>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="onAssignRoleCancel">取 消</el-button>
+        <el-button type="primary" @click="onAssignRoleConfirm">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -221,7 +201,11 @@ export default {
         ]
       },
       editDialogVisible: false,
-      editForm: {}
+      editForm: {},
+      assignDialogVisible: false,
+      assignForm: {},
+      rolesList: [],
+      selectedRoleId: ""
     };
   },
   created() {
@@ -388,6 +372,56 @@ export default {
           type: "info"
         });
       }
+    },
+    onCloseAssginDialog() {
+      this.selectedRoleId = "";
+      this.assignForm = {};
+    },
+    async onAssignRoles(scope) {
+      this.assignForm = scope.row;
+      // 在展示对话框前获取所有的角色列表
+      let { data } = await this.$axios.get("roles");
+      if (data.meta.status == 200) {
+        this.rolesList = data.data;
+      } else {
+        this.$message({
+          message: "获取角色列表失败"
+        });
+      }
+      this.assignDialogVisible = true;
+    },
+    onAssignRoleCancel() {
+      this.assignDialogVisible = false;
+      this.selectedRoleId = "";
+      this.onAssignRoles = {};
+    },
+    async onAssignRoleConfirm() {
+      let { id } = this.assignForm;
+      if (this.selectedRoleId) {
+        let { data } = await this.$axios.put(`users/${id}/role`, {
+          rid: this.selectedRoleId
+        });
+        if (data.meta.status == 200) {
+          this.getUserList();
+          this.$message({
+            message: "更新用户角色成功",
+            type: "success"
+          });
+          this.assignDialogVisible = false;
+          this.selectedRoleId = "";
+          this.assignForm = {};
+        } else {
+          this.$message({
+            message: "分配角色失败",
+            type: "fail"
+          });
+        }
+      } else {
+        this.$message({
+          message: "请选择要分配的角色",
+          type: "fail"
+        });
+      }
     }
   }
 };
@@ -399,6 +433,11 @@ export default {
     box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.2) !important;
     .el-table {
       margin-top: 15px;
+    }
+  }
+  .el-dialog__body {
+    p {
+      margin: 0px 0px 20px;
     }
   }
 }
