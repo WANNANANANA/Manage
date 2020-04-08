@@ -119,7 +119,7 @@
       title="分配角色"
       :visible.sync="assignDialogVisible"
       width="50%"
-      @close="onCloseAssginDialog"
+      @close="onCloseAssginDialog"`
     >
       <div>
         <p>当前的用户： {{assignForm.username}}</p>

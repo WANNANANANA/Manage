@@ -132,6 +132,9 @@ export default {
         border-right: none;
       }
     }
+    main {
+      background-color: #eaedf1;
+    }
   }
 }
 </style>
