@@ -4,7 +4,7 @@
     <!-- 卡片视图 -->
     <el-card>
       <el-row>
-        <el-button type="primary">添加分类</el-button>
+        <el-button type="primary" @click="onAddCategoty">添加分类</el-button>
       </el-row>
       <!-- 表格区域 -->
       <el-table
@@ -12,20 +12,66 @@
         style="width: 100%;margin-bottom: 20px;"
         row-key="cat_id"
         border
-        :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+        :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       >
         <el-table-column type="index" width="50">
-          <template v-slot="scope">{{definedIndex(scope)}}</template>
+          <!-- <template v-slot="scope">{{definedIndex(scope)}}</template> -->
         </el-table-column>
-        <el-table-column prop="cat_name" label="分类名称" width="180"></el-table-column>
+        <el-table-column
+          prop="cat_name"
+          label="分类名称"
+          width="180"
+        ></el-table-column>
         <el-table-column prop="cat_deleted" label="是否有效" width="180">
-          <el-button type="success" size="mini" icon="el-icon-check" circle></el-button>
+          <template v-slot="scope">
+            <i
+              class="el-icon-success"
+              v-if="scope.row.cat_deleted === false"
+              style="color: #3a8ee6"
+            ></i>
+            <i class="el-icon-error" v-else></i>
+          </template>
         </el-table-column>
-        <el-table-column prop="cat_level" label="排序"></el-table-column>
+        <el-table-column prop="cat_level" label="排序">
+          <template v-slot="scope">
+            <el-tag size="mini" v-if="scope.row.cat_level == 0">一级</el-tag>
+            <el-tag
+              type="success"
+              size="mini"
+              v-else-if="scope.row.cat_level == 1"
+              >二级</el-tag
+            >
+            <el-tag type="warning" size="mini" v-else>三级</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template v-slot="scope">
+            <el-button type="primary" icon="el-icon-edit" size="mini"
+              >编辑</el-button
+            >
+            <el-button type="danger" icon="el-icon-delete" size="mini"
+              >删除</el-button
+            >
+          </template>
+        </el-table-column>
       </el-table>
 
       <!-- 分页区域 -->
+      <el-pagination
+        @size-change="onSizeChange"
+        @current-change="onCurrentChange"
+        :current-page="queryInfo.pagenum"
+        :page-sizes="[3, 5, 10, 15]"
+        :page-size="queryInfo.pagesize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      >
+      </el-pagination>
     </el-card>
+    <!-- 添加分类的对话框 -->
+    <el-dialog title="添加分类" :visible.sync="addDialogVisible" width="50%">
+
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -100,7 +146,8 @@ export default {
           name: "王小虎",
           address: "上海市普陀区金沙江路 1516 弄"
         }
-      ]
+      ],
+      addDialogVisible: false,
     };
   },
   computed: {},
@@ -132,7 +179,18 @@ export default {
           return ++index;
         }
       };
-    })()
+    })(),
+    onSizeChange(newSize) {
+      this.queryInfo.pagesize = newSize;
+      this.getCateList();
+    },
+    onCurrentChange(newPage) {
+      this.queryInfo.pagenum = newPage;
+      this.getCateList();
+    },
+    onAddCategoty() {
+      this.addDialogVisible = true;
+    }
   }
 };
 </script>
