@@ -81,7 +81,7 @@
     <el-dialog
       title="分配权限"
       :visible.sync="assignDialogVisible"
-      @close="onResetDefaultKeys"
+      @close="onCloseAssignDialog"
     >
       <el-tree
         ref="rightTree"
@@ -185,7 +185,13 @@ export default {
         });
       }
     },
-    onAssignRightsCancel() {},
+    onCloseAssignDialog() {
+      // 关闭对话框的时候清空默认选择权限数组
+      this.defaultKeys = [];
+    },
+    onAssignRightsCancel() {
+      this.assignDialogVisible = false;
+    },
     async onAssignRightsConfirm() {
       let keysIdArr = [
         ...this.$refs.rightTree.getCheckedKeys(),
@@ -220,10 +226,6 @@ export default {
           this.getDefaultKeys(item, arr);
         });
       }
-    },
-    onResetDefaultKeys() {
-      // 关闭对话框的时候清空默认选择权限数组
-      this.defaultKeys = [];
     }
   }
 };

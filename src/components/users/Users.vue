@@ -119,7 +119,7 @@
       title="分配角色"
       :visible.sync="assignDialogVisible"
       width="50%"
-      @close="onCloseAssginDialog"`
+      @close="onCloseAssginDialog"
     >
       <div>
         <p>当前的用户： {{assignForm.username}}</p>
@@ -258,8 +258,7 @@ export default {
       this.$refs.addForm.resetFields();
     },
     onAddUserCancel() {
-      this.onCloseAddDialog();
-      this.addDialogVisible = false;
+      this.addDialogVisible = false; // 然后触发对话框@close事件
     },
     onAddUserConfirm() {
       this.$refs.addForm.validate(async valid => {
@@ -305,7 +304,6 @@ export default {
       this.$refs.editForm.resetFields();
     },
     onEditUserCancel() {
-      this.onCloseEditDialog();
       this.editDialogVisible = false;
     },
     onEditUserConfirm() {
@@ -392,8 +390,6 @@ export default {
     },
     onAssignRoleCancel() {
       this.assignDialogVisible = false;
-      this.selectedRoleId = "";
-      this.onAssignRoles = {};
     },
     async onAssignRoleConfirm() {
       let { id } = this.assignForm;
@@ -408,8 +404,6 @@ export default {
             type: "success"
           });
           this.assignDialogVisible = false;
-          this.selectedRoleId = "";
-          this.assignForm = {};
         } else {
           this.$message({
             message: "分配角色失败",

@@ -44,7 +44,7 @@
             <el-tag type="warning" size="mini" v-else>三级</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="200px">
           <template v-slot="scope">
             <el-button type="primary" icon="el-icon-edit" size="mini"
               >编辑</el-button
@@ -69,8 +69,35 @@
       </el-pagination>
     </el-card>
     <!-- 添加分类的对话框 -->
-    <el-dialog title="添加分类" :visible.sync="addDialogVisible" width="50%">
-
+    <el-dialog
+      title="添加分类"
+      :visible.sync="addDialogVisible"
+      width="50%"
+      @close="onCloseDialog"
+    >
+      <el-form
+        :model="addCategoryForm"
+        :rules="addCategoryFormRules"
+        ref="addCate"
+      >
+        <el-form-item label="分类名称" prop="cat_name">
+          <el-input v-model="addCategoryForm.cat_name"></el-input>
+        </el-form-item>
+        <el-form-item label="父级分类">
+          <el-cascader
+            v-model="selectedKeys"
+            :options="parentCateList"
+            :props="cateProps"
+            @change="onParentCateChanged"
+            clearable
+            change-on-select
+          ></el-cascader>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="onSubmitCancel">取消</el-button>
+          <el-button type="primary" @click="onSubmitConfirm">确定</el-button>
+        </el-form-item>
+      </el-form>
     </el-dialog>
   </div>
 </template>
@@ -148,6 +175,25 @@ export default {
         }
       ],
       addDialogVisible: false,
+      parentCateList: [],
+      addCategoryForm: {
+        cat_name: "",
+        cat_pid: 0,
+        cat_level: 0
+      },
+      addCategoryFormRules: {
+        cat_name: [
+          { required: true, message: "请输入分类名称", trigger: "blur" }
+        ]
+      },
+      cateProps: {
+        // 级联选择器的配置选项
+        expandTrigger: "hover",
+        value: "cat_id",
+        label: "cat_name",
+        children: "children"
+      },
+      selectedKeys: []
     };
   },
   computed: {},
@@ -189,7 +235,67 @@ export default {
       this.getCateList();
     },
     onAddCategoty() {
+      this.getParentCateList();
       this.addDialogVisible = true;
+    },
+    async getParentCateList() {
+      let { data } = await this.$axios("categories", {
+        params: {
+          type: 2
+        }
+      });
+      if (data.meta.status == 200) {
+        console.log(data);
+        this.parentCateList = data.data;
+      } else {
+        this.$message({
+          type: "fail",
+          message: "获取数据失败"
+        });
+      }
+    },
+    onParentCateChanged() {
+      //
+      console.log(this.selectedKeys);
+      let length = this.selectedKeys.length;
+      if (length) {
+        // 如果长度不为0 说明选择了分类
+        this.addCategoryForm.cat_pid = this.selectedKeys[length - 1]; // 选中的父级ID
+        this.addCategoryForm.cat_level = length; // 分类级别
+      } else {
+        // 问题：为什么这里都要重置为0???
+        this.addCategoryForm.cat_pid = 0;
+        this.addCategoryForm.cat_level = 0;
+      }
+    },
+    onCloseDialog() {
+      this.$refs.addCate.resetFields();
+      this.selectedKeys = [];
+      this.addCategoryForm.cat_level = 0;
+      this.addCategoryForm.cat_pid = 0;
+    },
+    onSubmitCancel() {
+      this.addDialogVisible = false;
+    },
+    onSubmitConfirm() {
+      // console.log(this.addCategoryForm);
+      this.$refs.addCate.validate(async valid => {
+        if(valid) {
+          let { data } = await this.$axios.post("categories", this.addCategoryForm);
+          if(data.meta.status == 201) {
+            this.$message({
+              message: '添加分类成功',
+              type: 'success'
+            })
+            this.addDialogVisible = false;
+          } else {
+            this.$message({
+              message: '添加分类失败',
+              type: 'fail'
+            })
+          }
+        }
+      })
     }
   }
 };
@@ -197,5 +303,15 @@ export default {
 <style lang="less" scoped>
 .el-row {
   margin-bottom: 15px;
+}
+
+.el-form-item {
+  &:last-child {
+    text-align: right;
+  }
+}
+
+.el-cascader {
+  width: 100%;
 }
 </style>
