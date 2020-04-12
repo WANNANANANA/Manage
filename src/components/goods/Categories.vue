@@ -98,14 +98,13 @@
             :props="cateProps"
             @change="onParentCateChanged"
             clearable
-            change-on-select
           ></el-cascader>
         </el-form-item>
-        <el-form-item>
-          <el-button @click="onAddSubmitCancel">取消</el-button>
-          <el-button type="primary" @click="onAddSubmitConfirm">确定</el-button>
-        </el-form-item>
       </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="onAddSubmitCancel">取 消</el-button>
+        <el-button type="primary" @click="onAddSubmitConfirm">确 定</el-button>
+      </span>
     </el-dialog>
     <!-- 编辑分类的对话框 -->
     <el-dialog
@@ -122,13 +121,11 @@
         <el-form-item label="分类名称" prop="cat_name">
           <el-input v-model="editCategoryForm.cat_name" clearable></el-input>
         </el-form-item>
-        <el-form-item>
-          <el-button @click="onEditSubmitCancel">取消</el-button>
-          <el-button type="primary" @click="onEditSubmitConfirm"
-            >确定</el-button
-          >
-        </el-form-item>
       </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="onEditSubmitCancel">取 消</el-button>
+        <el-button type="primary" @click="onEditSubmitConfirm">确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -165,6 +162,7 @@ export default {
       },
       cateProps: {
         // 级联选择器的配置选项
+        checkStrictly: true,
         expandTrigger: "hover",
         value: "cat_id",
         label: "cat_name",
@@ -347,25 +345,25 @@ export default {
           type: "warning"
         }
       ).catch(error => error);
-      if(confirmResult == 'confirm') {
-        let {data} = await this.$axios.delete(`categories/${cat_id}`);
-        if(data.meta.status == 200) {
+      if (confirmResult == "confirm") {
+        let { data } = await this.$axios.delete(`categories/${cat_id}`);
+        if (data.meta.status == 200) {
           this.getCateList();
           this.$message({
-            message: '删除分类成功',
-            type: 'success'
-          })
+            message: "删除分类成功",
+            type: "success"
+          });
         } else {
           this.$message({
-            message: '删除分类失败',
-            type: 'fail'
-          })
+            message: "删除分类失败",
+            type: "fail"
+          });
         }
       } else {
         this.$message({
-          message: '已取消删除操作',
-          type: 'info'
-        })
+          message: "已取消删除操作",
+          type: "info"
+        });
       }
     }
   }
