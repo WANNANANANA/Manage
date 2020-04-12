@@ -46,10 +46,18 @@
         </el-table-column>
         <el-table-column label="操作" width="200px">
           <template v-slot="scope">
-            <el-button type="primary" icon="el-icon-edit" size="mini"
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+              @click="onEditCategory(scope)"
               >编辑</el-button
             >
-            <el-button type="danger" icon="el-icon-delete" size="mini"
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              @click="onDeleteCategory(scope)"
               >删除</el-button
             >
           </template>
@@ -73,7 +81,7 @@
       title="添加分类"
       :visible.sync="addDialogVisible"
       width="50%"
-      @close="onCloseDialog"
+      @close="onCloseAddDialog"
     >
       <el-form
         :model="addCategoryForm"
@@ -94,8 +102,31 @@
           ></el-cascader>
         </el-form-item>
         <el-form-item>
-          <el-button @click="onSubmitCancel">取消</el-button>
-          <el-button type="primary" @click="onSubmitConfirm">确定</el-button>
+          <el-button @click="onAddSubmitCancel">取消</el-button>
+          <el-button type="primary" @click="onAddSubmitConfirm">确定</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+    <!-- 编辑分类的对话框 -->
+    <el-dialog
+      title="编辑分类"
+      :visible.sync="editDialogVisible"
+      width="50%"
+      @close="onCloseEditDialog"
+    >
+      <el-form
+        :model="editCategoryForm"
+        :rules="editCategoryFormRules"
+        ref="editCate"
+      >
+        <el-form-item label="分类名称" prop="cat_name">
+          <el-input v-model="editCategoryForm.cat_name" clearable></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="onEditSubmitCancel">取消</el-button>
+          <el-button type="primary" @click="onEditSubmitConfirm"
+            >确定</el-button
+          >
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -120,60 +151,6 @@ export default {
       },
       cateList: [],
       total: 0,
-      tableData: [
-        {
-          id: 1,
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄"
-        },
-        {
-          id: 2,
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄"
-        },
-        {
-          id: 3,
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1519 弄",
-          children: [
-            {
-              id: 31,
-              date: "2016-05-01",
-              name: "王小虎",
-              address: "上海市普陀区金沙江路 1519 弄",
-              children: [
-                {
-                  id: 311,
-                  date: "2016-05-01",
-                  name: "王小虎",
-                  address: "上海市普陀区金沙江路 1519 弄"
-                },
-                {
-                  id: 312,
-                  date: "2016-05-01",
-                  name: "王小虎",
-                  address: "上海市普陀区金沙江路 1519 弄"
-                }
-              ]
-            },
-            {
-              id: 32,
-              date: "2016-05-01",
-              name: "王小虎",
-              address: "上海市普陀区金沙江路 1519 弄"
-            }
-          ]
-        },
-        {
-          id: 4,
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄"
-        }
-      ],
       addDialogVisible: false,
       parentCateList: [],
       addCategoryForm: {
@@ -193,7 +170,17 @@ export default {
         label: "cat_name",
         children: "children"
       },
-      selectedKeys: []
+      selectedKeys: [],
+      editDialogVisible: false,
+      editCategoryForm: {
+        cat_id: "",
+        cat_name: ""
+      },
+      editCategoryFormRules: {
+        cat_name: [
+          { required: true, message: "分类名称不能为空", trigger: "blur" }
+        ]
+      }
     };
   },
   computed: {},
@@ -202,7 +189,7 @@ export default {
       let { data } = await this.$axios.get("categories", {
         params: this.queryInfo
       });
-      console.log(data);
+      // console.log(data);
       if (data.meta.status == 200) {
         this.cateList = data.data.result;
         this.total = data.data.total;
@@ -255,8 +242,7 @@ export default {
       }
     },
     onParentCateChanged() {
-      //
-      console.log(this.selectedKeys);
+      // console.log(this.selectedKeys);
       let length = this.selectedKeys.length;
       if (length) {
         // 如果长度不为0 说明选择了分类
@@ -268,34 +254,119 @@ export default {
         this.addCategoryForm.cat_level = 0;
       }
     },
-    onCloseDialog() {
+    onCloseAddDialog() {
       this.$refs.addCate.resetFields();
       this.selectedKeys = [];
       this.addCategoryForm.cat_level = 0;
       this.addCategoryForm.cat_pid = 0;
     },
-    onSubmitCancel() {
+    onAddSubmitCancel() {
       this.addDialogVisible = false;
     },
-    onSubmitConfirm() {
+    onAddSubmitConfirm() {
       // console.log(this.addCategoryForm);
       this.$refs.addCate.validate(async valid => {
-        if(valid) {
-          let { data } = await this.$axios.post("categories", this.addCategoryForm);
-          if(data.meta.status == 201) {
+        if (valid) {
+          let { data } = await this.$axios.post(
+            "categories",
+            this.addCategoryForm
+          );
+          if (data.meta.status == 201) {
             this.$message({
-              message: '添加分类成功',
-              type: 'success'
-            })
+              message: "添加分类成功",
+              type: "success"
+            });
             this.addDialogVisible = false;
           } else {
             this.$message({
-              message: '添加分类失败',
-              type: 'fail'
-            })
+              message: "添加分类失败",
+              type: "fail"
+            });
           }
         }
-      })
+      });
+    },
+    async onEditCategory(scope) {
+      let {
+        row: { cat_id }
+      } = scope;
+      let { data } = await this.$axios.get(`categories/${cat_id}`);
+      console.log(data);
+      if (data.meta.status == 200) {
+        this.editCategoryForm.cat_id = data.data.cat_id;
+        this.editCategoryForm.cat_name = data.data.cat_name;
+        this.editDialogVisible = true;
+      } else {
+        console.log(data.meta.msg);
+        this.$message({
+          message: "获取商品分类信息失败",
+          type: "fail"
+        });
+      }
+    },
+    onCloseEditDialog() {
+      this.$refs.editCate.resetFields();
+    },
+    onEditSubmitCancel() {
+      this.editDialogVisible = false;
+    },
+    onEditSubmitConfirm() {
+      this.$refs.editCate.validate(async valid => {
+        if (valid) {
+          let { cat_id, cat_name } = this.editCategoryForm;
+          let { data } = await this.$axios.put(`categories/${cat_id}`, {
+            cat_name
+          });
+          if (data.meta.status == 200) {
+            this.getCateList();
+            this.$message({
+              message: "更新成功",
+              type: "success"
+            });
+            this.editDialogVisible = false;
+          } else {
+            console.log(data.meta);
+            this.$message({
+              message: "更新失败",
+              type: "fail"
+            });
+          }
+        }
+      });
+    },
+    async onDeleteCategory(scope) {
+      let {
+        row: { cat_id }
+      } = scope;
+      let confirmResult = await this.$confirm(
+        "确定要永久删除此分类吗？",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      ).catch(error => error);
+      if(confirmResult == 'confirm') {
+        let {data} = await this.$axios.delete(`categories/${cat_id}`);
+        if(data.meta.status == 200) {
+          this.getCateList();
+          this.$message({
+            message: '删除分类成功',
+            type: 'success'
+          })
+        } else {
+          this.$message({
+            message: '删除分类失败',
+            type: 'fail'
+          })
+        }
+      } else {
+        this.$message({
+          message: '已取消删除操作',
+          type: 'info'
+        })
+      }
     }
   }
 };
