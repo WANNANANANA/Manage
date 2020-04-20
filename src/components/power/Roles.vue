@@ -134,7 +134,7 @@ export default {
         console.log(data.meta.msg);
         this.$message({
           $message: "获取角色列表失败",
-          type: "fail"
+          type: "error"
         });
       }
     },
@@ -160,7 +160,7 @@ export default {
         } else {
           this.$message({
             message: "删除权限失败",
-            type: "fail"
+            type: "error"
           });
         }
       } else {
@@ -181,7 +181,7 @@ export default {
       } else {
         this.$message({
           message: "获取权限数据失败",
-          type: "fail"
+          type: "error"
         });
       }
     },
@@ -213,7 +213,7 @@ export default {
         console.log(data.meta.msg);
         this.$message({
           message: "分配权限失败",
-          type: "fail"
+          type: "error"
         });
       }
     },

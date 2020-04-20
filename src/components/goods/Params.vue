@@ -273,7 +273,7 @@ export default {
       } else {
         this.$message({
           message: "获取商品分类失败",
-          type: "fail"
+          type: "error"
         });
       }
     },
@@ -308,7 +308,7 @@ export default {
         console.log(data.meta.msg);
         this.$message({
           message: "获取参数失败",
-          type: "fail"
+          type: "error"
         });
       }
     },
@@ -352,7 +352,7 @@ export default {
             console.log(data.meta.msg);
             this.$message({
               message: "添加参数失败",
-              type: "fail"
+              type: "error"
             });
           }
         }
@@ -380,7 +380,7 @@ export default {
       } else {
         this.$message({
           message: "获取参数信息失败",
-          type: "fail"
+          type: "error"
         });
       }
     },
@@ -411,7 +411,7 @@ export default {
             console.log(data.meta.msg);
             this.$message({
               message: "修改失败",
-              type: "fail"
+              type: "error"
             });
           }
         }
@@ -445,7 +445,7 @@ export default {
           console.log(data.meta.msg);
           this.$message({
             message: "删除失败",
-            type: "fail"
+            type: "error"
           });
         }
       } else {
@@ -472,7 +472,7 @@ export default {
       } else {
         this.$message({
           message: "修改参数项失败",
-          type: "fail"
+          type: "error"
         });
       }
     },

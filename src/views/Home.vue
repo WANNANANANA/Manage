@@ -15,7 +15,7 @@
         <el-aside :width="collapseKey ? '64px' : '200px'">
           <div class="toggle-button" @click="toggleCollapse">|||</div>
           <el-menu
-            :default-active="$route.path"
+            :default-active="$route.path.split('/')[0]"
             class="el-menu-vertical-demo"
             background-color="#373d41"
             text-color="#fff"
@@ -73,11 +73,12 @@ export default {
   },
   created() {
     this.getMenuList();
+    console.log(this.$route);
   },
   methods: {
     async getMenuList() {
       const { data } = await this.$axios.get("menus");
-    //   console.log(data);
+      // console.log(data.data);
       if (data.meta.status == 200) {
         this.menuList = data.data;
       } else {

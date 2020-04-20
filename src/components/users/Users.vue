@@ -277,7 +277,7 @@ export default {
           } else {
             this.$message({
               message: "添加失败",
-              type: "fail"
+              type: "error"
             });
             console.log(data.meta.msg);
           }
@@ -296,7 +296,7 @@ export default {
       } else {
         this.$message({
           message: "查询用户信息失败",
-          type: "fail"
+          type: "error"
         });
       }
     },
@@ -330,7 +330,7 @@ export default {
             console.log(data.meta.msg);
             this.$message({
               message: "更新用户信息失败",
-              type: "fail"
+              type: "error"
             });
           }
         }
@@ -361,7 +361,7 @@ export default {
         } else {
           this.$message({
             message: "删除用户失败",
-            type: "fail"
+            type: "error"
           });
         }
       } else {
@@ -407,13 +407,13 @@ export default {
         } else {
           this.$message({
             message: "分配角色失败",
-            type: "fail"
+            type: "error"
           });
         }
       } else {
         this.$message({
           message: "请选择要分配的角色",
-          type: "fail"
+          type: "error"
         });
       }
     }

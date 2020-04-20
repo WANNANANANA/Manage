@@ -43,7 +43,7 @@ export default {
       } else {
         this.$message({
           message: "获取权限列表失败",
-          type: "fail"
+          type: "error"
         });
       }
     }

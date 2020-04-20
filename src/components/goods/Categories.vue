@@ -195,7 +195,7 @@ export default {
         console.log(data.meta.msg);
         this.$message({
           message: "获取商品分类失败",
-          type: "fail"
+          type: "error"
         });
       }
     },
@@ -234,7 +234,7 @@ export default {
         this.parentCateList = data.data;
       } else {
         this.$message({
-          type: "fail",
+          type: "error",
           message: "获取数据失败"
         });
       }
@@ -278,7 +278,7 @@ export default {
           } else {
             this.$message({
               message: "添加分类失败",
-              type: "fail"
+              type: "error"
             });
           }
         }
@@ -298,7 +298,7 @@ export default {
         console.log(data.meta.msg);
         this.$message({
           message: "获取商品分类信息失败",
-          type: "fail"
+          type: "error"
         });
       }
     },
@@ -326,7 +326,7 @@ export default {
             console.log(data.meta);
             this.$message({
               message: "更新失败",
-              type: "fail"
+              type: "error"
             });
           }
         }
@@ -356,7 +356,7 @@ export default {
         } else {
           this.$message({
             message: "删除分类失败",
-            type: "fail"
+            type: "error"
           });
         }
       } else {
