@@ -44,7 +44,7 @@ Vue.filter('dateFormat', function (originVal) {  // 格式化时间的过滤器
   return `${year}-${month}-${date} ${hour}:${minute}:${second}`
 })
 
-Vue.use(ElementUI)
+// Vue.use(ElementUI)
 Vue.use(VueQuillEditor)
 
 new Vue({
