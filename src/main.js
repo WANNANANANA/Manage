@@ -11,15 +11,25 @@ import VueQuillEditor from 'vue-quill-editor' // 富文本编辑器
 import 'quill/dist/quill.core.css' // import styles
 import 'quill/dist/quill.snow.css' // for snow theme
 import 'quill/dist/quill.bubble.css' // for bubble theme
+import NProgress from 'nprogress' // 进度条
+import 'nprogress/nprogress.css' // 进度条样式包
 
 Vue.config.productionTip = false
 
-axios.defaults.baseURL = 'http://timemeetyou.com:8889/api/private/v1/'
-axios.interceptors.request.use(config => { // axios拦截器为请求头添加token
-  config.headers.Authorization = window.sessionStorage.getItem('token');
+axios.defaults.baseURL = 'http://timemeetyou.com:8889/api/private/v1/'  
+// request拦截器
+axios.interceptors.request.use(config => {
+  config.headers.Authorization = window.sessionStorage.getItem('token'); // 请求头添加token
   // console.log(config);
+  NProgress.start();
   return config; // 这句必须 否则报错
+})  
+// resonse拦截器
+axios.interceptors.response.use(config => {
+  NProgress.done();
+  return config;
 })
+
 Vue.prototype.$axios = axios; // 挂载到vue全局
 
 Vue.filter('dateFormat', function (originVal) {  // 格式化时间的过滤器
