@@ -1,53 +1,30 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '../views/Login'
-import Home from '../views/Home'
-import Welcome from '../components/Welcome'
-import Users from '../components/users/Users'
-import Rights from '../components/power/Rights'
-import Roles from '../components/power/Roles'
-import Categories from '../components/goods/Categories'
-import Params from '../components/goods/Params'
-import List from '../components/goods/List.vue'
-import Add from '../components/goods/Add.vue'
-import Order from '../components/order/Order.vue'
-import Report from '../components/report/Report.vue'
 
 Vue.use(VueRouter)
-
-const routes = [
-  // {
-  //   path: '/about',
-  //   name: 'About',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  // }
-]
 
 const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
     { path: '/', redirect: '/login' }, // 路由重定向
-    { path: '/login', name: 'Login', component: Login },
+    { path: '/login', name: 'Login', component: () => import(/* webpackChunkName: "Login_Home_Welcome" */ '../views/Login') },
     {
       path: '/home',
       name: 'Home',
-      component: Home,
+      component: () => import(/* webpackChunkName: "Login_Home_Welcome" */ '../views/Home'),
       redirect: '/welcome',
       children: [
-        { path: '/welcome', name: 'Welcome', component: Welcome },
-        { path: '/users', name: 'Users', component: Users },
-        { path: '/rights', name: 'Rights', component: Rights },
-        { path: '/roles', name: 'Roles', component: Roles },
-        { path: '/categories', name: 'Categories', component: Categories },
-        { path: '/params', name: 'Params', component: Params },
-        { path: '/goods', name: 'List', component: List },
-        { path: '/goods/add', name: 'Add', component: Add },
-        { path: '/orders', name: 'Order', component: Order },
-        { path: '/reports', name: 'Report', component: Report }
+        { path: '/welcome', name: 'Welcome', component: () => import(/* webpackChunkName: "Login_Home_Welcome" */ '../components/Welcome') }, 
+        { path: '/users', name: 'Users', component: () => import(/* webpackChunkName: "Users_Rights_Roles" */ '../components/users/Users') },
+        { path: '/rights', name: 'Rights',  component: () => import(/* webpackChunkName: "Users_Rights_Roles" */ '../components/power/Rights') },
+        { path: '/roles', name: 'Roles',  component: () => import(/* webpackChunkName: "Users_Rights_Roles" */ '../components/power/Roles') },
+        { path: '/categories', name: 'Categories', component: () => import(/* webpackChunkName: "Categories_Params" */ '../components/goods/Categories') },
+        { path: '/params', name: 'Params', component: () => import(/* webpackChunkName: "Categories_Params" */ '../components/goods/Params') },
+        { path: '/goods', name: 'List', component: () => import(/* webpackChunkName: "List_Add"" */ '../components/goods/List') },
+        { path: '/goods/add', name: 'Add', component: () => import(/* webpackChunkName: "List_Add"" */ '../components/goods/Add') },
+        { path: '/orders', name: 'Order', component: () => import(/* webpackChunkName: "Order_Report" */ '../components/order/Order') },
+        { path: '/reports', name: 'Report', component: () => import(/* webpackChunkName: "Order_Report" */ '../components/report/Report') },
       ]
     }
   ]

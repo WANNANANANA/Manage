@@ -15,10 +15,10 @@ module.exports = {
                 'vue-quill-editor': 'VueQuillEditor'
             })
 
-            config.plugin('html', tap(args => {
+            config.plugin('html').tap(args => {
                 args[0].isProd = true;
                 return args;
-            }))
+            })
         })
 
         // 开发模式
